@@ -1,8 +1,7 @@
 fun main() {
     fun part1(input: List<String>): Int {
-        val visited = mutableSetOf<Pair<Int, Int>>()
 
-        fun explore(r: Int, c: Int): Int {
+        fun explore(r: Int, c: Int, visited: MutableSet<Pair<Int, Int>> = mutableSetOf()): Int {
             if (r !in input.indices || c !in input[r].indices) return 0
             if (r to c in visited) return 0
 
@@ -12,11 +11,11 @@ fun main() {
             if (nR >= input.size) return 0
 
             return when(input[nR][c]) {
-                '.', 'S' -> explore(nR, c)
+                '.', 'S' -> explore(nR, c,visited)
                 '^' -> {
                     var splits = 1
-                    splits += explore(nR, c - 1)
-                    splits += explore(nR, c + 1)
+                    splits += explore(nR, c - 1,visited)
+                    splits += explore(nR, c + 1,visited)
                     splits
                 }
                 else -> error("Illegal state")
@@ -35,11 +34,8 @@ fun main() {
     }
 
     fun part2(input: List<String>): Long {
-        val visited = mutableSetOf<Pair<Int, Int>>()
-
         fun explore(r: Int, c: Int, memo: MutableMap<Pair<Int, Int>, Long> = mutableMapOf()): Long {
             if (r !in input.indices || c !in input[r].indices) return 0
-            if (r to c in visited) return 0
             if (r to c in memo) return memo.getValue(r to c)
 
             val nR = r + 1
