@@ -42,12 +42,12 @@ fun main() {
         return sqr(dx) + sqr(dy) + sqr(dz)
     }
 
-    fun part1(input: List<String>): Long {
-        val points = input.map { line ->
-            val (x, y, z) = line.split(',').map { it.toLong() }
-            Point(x, y, z)
-        }
+    fun parsePoints(input: List<String>) = input.map { line ->
+        val (x, y, z) = line.split(',').map { it.toLong() }
+        Point(x, y, z)
+    }
 
+    fun buildSortedEdges(points: List<Point>): List<Edge> {
         val edges = mutableListOf<Edge>()
         for (i in points.indices) {
             for (j in i + 1 until points.size) {
@@ -56,12 +56,17 @@ fun main() {
             }
         }
 
-        edges.sortBy { it.distSquared }
+        return edges.sortedBy { it.distSquared }
+    }
+
+    fun part1(input: List<String>): Long {
+        val points = parsePoints(input)
+        val edges = buildSortedEdges(points)
 
         val uf = UnionFind(points.size)
-
         val maxConnections = 1000
         var edgesUsed = 0
+
         for (e in edges) {
             uf.union(e.i, e.j)
             edgesUsed++
@@ -79,23 +84,10 @@ fun main() {
     }
 
     fun part2(input: List<String>): Long {
-        val points = input.map { line ->
-            val (x, y, z) = line.split(',').map { it.toLong() }
-            Point(x, y, z)
-        }
-
-        val edges = mutableListOf<Edge>()
-        for (i in points.indices) {
-            for (j in i + 1 until points.size) {
-                val distSquared = squaredDistance(points[i], points[j])
-                edges.add(Edge(i, j, distSquared))
-            }
-        }
-
-        edges.sortBy { it.distSquared }
+        val points = parsePoints(input)
+        val edges = buildSortedEdges(points)
 
         val uf = UnionFind(points.size)
-
         var components = points.size
 
         for (e in edges) {
