@@ -69,6 +69,45 @@ fun main() {
         }
     }
 
+    fun part2(input: List<String>): Int {
+        val machineDiagrams = parseInput(input)
+
+        fun dfs(
+            targetJoltage: List<Int>,
+            currentJoltage: List<Int>,
+            commands: List<List<Int>>,
+            memo: MutableMap<List<Int>, Int> = mutableMapOf()
+        ): Int {
+            if (currentJoltage == targetJoltage) return 0
+            if (currentJoltage.zip(targetJoltage).any { (a, b) -> a > b }) return -1
+            if (currentJoltage in memo) return memo.getValue(currentJoltage)
+
+            var minPresses = -1
+            for (command in commands) {
+                val newJoltage = currentJoltage.toMutableList()
+                for (i in command) {
+                    newJoltage[i]++
+                }
+                val subPresses = dfs(targetJoltage,newJoltage, commands, memo)
+                if (subPresses != -1) {
+                    val numPresses = subPresses + 1
+                    if (minPresses == -1 || numPresses < minPresses) {
+                        minPresses = numPresses
+                    }
+                }
+            }
+
+            memo[currentJoltage] = minPresses
+
+            return minPresses
+        }
+
+        return machineDiagrams.sumOf { (_, schematics, joltages) ->
+            dfs(joltages, joltages.map { 0 }, schematics)
+        }
+    }
+
     val input = readInput("Day10")
     part1(input).println()
+    part2(input).println()
 }
